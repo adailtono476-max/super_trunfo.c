@@ -1,91 +1,107 @@
-# super_trunfo.c
-Meu projeto
-#include <stdio.h>
-#include <string.h>
+#include <stdio.h> // Para funções de entrada/saída como printf e scanf
+#include <string.h> // Para funções de manipulação de strings como strlen e strtok
 
-// Estrutura para representar uma carta do Super Trunfo
+// Definição da estrutura para armazenar os dados de uma cidade
 typedef struct {
-    char estado; // Letra de 'A' a 'H'
-    char codigo[5]; // Ex: "A01"
-    char nome_cidade[50]; // Nome da cidade
-    int populacao; // Número de habitantes
-    float area_km2; // Área em km²
-    float pib_bilhoes; // PIB em bilhões de reais
-    int pontos_turisticos; // Quantidade de pontos turísticos
-} CartaSuperTrunfo;
+    char estado[50];
+    char codigo[50];
+    char nomeCidade[100];
+    long populacao;
+    float area; // em km²
+    float pib; // em bilhões de reais
+    int pontosTuristicos;
+    float densidadePopulacional; // Calculado
+    float pibPerCapita; // Calculado
+} Cidade;
 
-int main() {
-    // Declaração de duas cartas
-    CartaSuperTrunfo carta1, carta2;
-
-    // --- Coleta de dados para a Carta 1 ---
-    printf("\n--- CADASTRO DA CARTA 1 ---\n");
-
-    printf("Digite o Estado (A-H): ");
-    scanf(" %c", &carta1.estado); // Note o espaço antes de %c para consumir o newline anterior
-
-    printf("Digite o Código da Carta (ex: A01): ");
-    scanf("%s", carta1.codigo);
-
-    printf("Digite o Nome da Cidade: ");
-    scanf("%s", carta1.nome_cidade);
-
-    printf("Digite a População: ");
-    scanf("%d", &carta1.populacao);
-
-    printf("Digite a Área (em km²): ");
-    scanf("%f", &carta1.area_km2);
-
-    printf("Digite o PIB (em bilhões de reais): ");
-    scanf("%f", &carta1.pib_bilhoes);
-
-    printf("Digite o Número de Pontos Turísticos: ");
-    scanf("%d", &carta1.pontos_turisticos);
-
-    // --- Coleta de dados para a Carta 2 ---
-    printf("\n--- CADASTRO DA CARTA 2 ---\n");
-
-    printf("Digite o Estado (A-H): ");
-    scanf(" %c", &carta2.estado);
-
-    printf("Digite o Código da Carta (ex: A01): ");
-    scanf("%s", carta2.codigo);
-
-    printf("Digite o Nome da Cidade: ");
-    scanf("%s", carta2.nome_cidade);
-
-    printf("Digite a População: ");
-    scanf("%d", &carta2.populacao);
-
-    printf("Digite a Área (em km²): ");
-    scanf("%f", &carta2.area_km2);
-
-    printf("Digite o PIB (em bilhões de reais): ");
-    scanf("%f", &carta2.pib_bilhoes);
-
-    printf("Digite o Número de Pontos Turísticos: ");
-    scanf("%d", &carta2.pontos_turisticos);
-
-    // --- Exibição das informações da Carta 1 ---
-    printf("\n\n======= DETALHES DA CARTA 1 =======\n");
-    printf("Estado: %c\n", carta1.estado);
-    printf("Código: %s\n", carta1.codigo);
-    printf("Nome da Cidade: %s\n", carta1.nome_cidade);
-    printf("População: %d\n", carta1.populacao);
-    printf("Área: %.2f km²\n", carta1.area_km2);
-    printf("PIB: %.2f bilhões de reais\n", carta1.pib_bilhoes);
-    printf("Número de Pontos Turísticos: %d\n", carta1.pontos_turisticos);
-
-    // --- Exibição das informações da Carta 2 ---
-    printf("\n\n======= DETALHES DA CARTA 2 =======\n");
-    printf("Estado: %c\n", carta2.estado);
-    printf("Código: %s\n", carta2.codigo);
-    printf("Nome da Cidade: %s\n", carta2.nome_cidade);
-    printf("População: %d\n", carta2.populacao);
-    printf("Área: %.2f km²\n", carta2.area_km2);
-    printf("PIB: %.2f bilhões de reais\n", carta2.pib_bilhoes);
-    printf("Número de Pontos Turísticos: %d\n", carta2.pontos_turisticos);
-
-    return 0;
+// Função para limpar o buffer de entrada
+void limparBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
 }
 
+// Função para ler os dados de uma cidade
+void lerDadosCidade(Cidade *cidade, int numeroCarta) {
+    printf("\n--- Dados da Carta %d ---\n", numeroCarta);
+
+    printf("Estado: ");
+    fgets(cidade->estado, sizeof(cidade->estado), stdin);
+    strtok(cidade->estado, "\n"); // Remove o caractere de nova linha
+
+    printf("Código da Carta: ");
+    fgets(cidade->codigo, sizeof(cidade->codigo), stdin);
+    strtok(cidade->codigo, "\n");
+
+    printf("Nome da Cidade: ");
+    fgets(cidade->nomeCidade, sizeof(cidade->nomeCidade), stdin);
+    strtok(cidade->nomeCidade, "\n");
+
+    printf("População: ");
+    scanf("%ld", &cidade->populacao);
+    limparBuffer(); // Limpa o buffer após scanf
+
+    printf("Área (em km²): ");
+    scanf("%f", &cidade->area);
+    limparBuffer(); // Limpa o buffer após scanf
+
+    printf("PIB (em bilhões de reais): ");
+    scanf("%f", &cidade->pib);
+    limparBuffer(); // Limpa o buffer após scanf
+
+    printf("Número de Pontos Turísticos: ");
+    scanf("%d", &cidade->pontosTuristicos);
+    limparBuffer(); // Limpa o buffer após scanf
+}
+
+// Função para calcular a densidade populacional e o PIB per capita
+void calcularMetricasCidade(Cidade *cidade) {
+    // Calcula a Densidade Populacional
+    if (cidade->area > 0) {
+        cidade->densidadePopulacional = (float)cidade->populacao / cidade->area;
+    } else {
+        cidade->densidadePopulacional = 0.0; // Evita divisão por zero
+    }
+
+    // Calcula o PIB per Capita
+    // O PIB é dado em bilhões, então multiplicamos por 1,000,000,000
+    if (cidade->populacao > 0) {
+        cidade->pibPerCapita = (cidade->pib * 1000000000.0) / (float)cidade->populacao;
+    } else {
+        cidade->pibPerCapita = 0.0; // Evita divisão por zero
+    }
+}
+
+// Função para exibir os dados de uma cidade
+void exibirDadosCidade(const Cidade *cidade, int numeroCarta) {
+    printf("\n--- Carta %d ---\n", numeroCarta);
+    printf("Estado: %s\n", cidade->estado);
+    printf("Código: %s\n", cidade->codigo);
+    printf("Nome da Cidade: %s\n", cidade->nomeCidade);
+    printf("População: %ld\n", cidade->populacao);
+    printf("Área: %.2f km²\n", cidade->area);
+    printf("PIB: %.2f bilhões de reais\n", cidade->pib);
+    printf("Número de Pontos Turísticos: %d\n", cidade->pontosTuristicos);
+    printf("Densidade Populacional: %.2f hab/km²\n", cidade->densidadePopulacional);
+    printf("PIB per Capita: %.2f reais\n", cidade->pibPerCapita);
+}
+
+int main() {
+    Cidade cidade1; // Declaração da primeira cidade
+    Cidade cidade2; // Declaração da segunda cidade
+
+    // Leitura dos dados para a primeira cidade
+    lerDadosCidade(&cidade1, 1);
+    // Cálculo das métricas para a primeira cidade
+    calcularMetricasCidade(&cidade1);
+
+    // Leitura dos dados para a segunda cidade
+    lerDadosCidade(&cidade2, 2);
+    // Cálculo das métricas para a segunda cidade
+    calcularMetricasCidade(&cidade2);
+
+    // Exibição dos resultados para ambas as cidades
+    exibirDadosCidade(&cidade1, 1);
+    exibirDadosCidade(&cidade2, 2);
+
+    return 0; // Indica que o programa foi executado com sucesso
+}
